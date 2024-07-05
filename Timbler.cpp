@@ -3,6 +3,14 @@
 
 using namespace sf;
 
+void updateBranches(int seed);
+
+const int NUM_BRANCHES = 6;
+Sprite branches[NUM_BRANCHES];
+
+enum class side {LEFT, RIGHT, NONE};
+side branchPositions[NUM_BRANCHES];
+
 int main() {
 	VideoMode vm(1920, 1080);
 	RenderWindow window(vm, "Timber!!", Style::Fullscreen);
@@ -100,6 +108,17 @@ int main() {
 	
 
 
+	Texture textureBranch;
+	textureBranch.loadFromFile("graphics/branch.png");
+
+
+	for (int i = 0; i < NUM_BRANCHES; i++) {
+		branches[i].setTexture(textureBranch);
+		branches[i].setPosition(-2000, -2000);
+		branches[i].setOrigin(220, 20);
+	}
+
+
 	while (window.isOpen()) {
 		if (Keyboard::isKeyPressed(Keyboard::Escape)) {
 			window.close();
@@ -192,6 +211,25 @@ int main() {
 			std::stringstream ss;
 			ss << "Score = " << score;
 			scoreText.setString(ss.str());
+
+			for (int i = 0; i < NUM_BRANCHES; i++)
+			{
+				float height = i * 150;
+
+				if (branchPositions[i] == side::LEFT) {
+					branches[i].setPosition(610, height);
+					branches[i].setRotation(180);
+				}
+				else if (branchPositions[i] == side::RIGHT) {
+					
+					branches[i].setPosition(1330, height);
+					branches[i].setRotation(0);
+				}
+				else
+				{
+					branches[i].setPosition(3000, height);
+				}
+			}
 		}
 
 		window.clear();
@@ -202,6 +240,11 @@ int main() {
 		window.draw(spriteCloud1);
 		window.draw(spriteCloud2);
 		window.draw(spriteCloud3);
+
+		for (int i = 0; i < NUM_BRANCHES; i++)
+		{
+			window.draw(branches[i]);
+		}
 
 		window.draw(spriteTree);
 
@@ -220,4 +263,28 @@ int main() {
 
 
 	return 0;
+}
+
+
+void updateBranches(int seed) {
+	for (int i = NUM_BRANCHES - 1; i > 0; i--)
+	{
+		branchPositions[i] = branchPositions[i - 1];
+	}
+
+	srand((int)time(0) + seed);
+	int r = (rand() % 5);
+
+	switch (r)
+	{
+	case 0:
+		branchPositions[0] = side::LEFT;
+		break;
+	case 1:
+		branchPositions[0] = side::RIGHT;
+		break;
+	default:
+		branchPositions[0] = side::NONE;
+		break;
+	}
 }
